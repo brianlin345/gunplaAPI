@@ -13,6 +13,7 @@ c = conn.cursor()
 c.execute('''SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='gunpla' ''')
 if c.fetchone()[0]==1:
 	print('Table exists.')
+	c.execute('''DELETE FROM gunpla''')
 else:
 	c.execute('''CREATE TABLE gunpla (id integer, name text, series text, height real, manufacturer text, price real, release text)''')
 
