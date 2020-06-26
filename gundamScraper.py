@@ -3,11 +3,13 @@ from urllib.request import urlopen
 import sqlite3
 from bs4 import BeautifulSoup
 
+"""Constants for wiki link and database files"""
 wiki_root = 'https://gundam.fandom.com'
 wiki_link = 'https://gundam.fandom.com/wiki/High_Grade_Universal_Century'
 db_file = "gunplaData.db"
 db_entries = []
 
+"""Creates connection to database and creates table if needed"""
 conn = sqlite3.connect(db_file)
 c = conn.cursor()
 c.execute('''SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='gunpla' ''')
@@ -18,6 +20,7 @@ else:
 	c.execute('''CREATE TABLE gunpla (id integer, name text, series text, height real, manufacturer text, price real, release text)''')
 
 def process_ms_info(ms_link):
+	"""Scrapes mobile suit information from wiki page such as height and manufacturer with checks for invalid data"""
 	response = urlopen(ms_link)
 	page = BeautifulSoup(response)
 	if page.find("span", attrs = {"class": "smwtext"}) != None:
@@ -35,6 +38,7 @@ def process_ms_info(ms_link):
 	return [height, manufacturer]
 
 def process_kit_info(kit_info_list, index):
+	"""Scrapes information for an individual kit including data for its mobile suit on main wiki page"""
 	info_list = [index]
 	ms_info = [0, "N/A"]
 	for i in range(1, 3):
@@ -53,6 +57,7 @@ def process_kit_info(kit_info_list, index):
 	db_entries.append(info_entry)
 
 def scrape_wiki(wiki_link):
+	"""Main scraping method which compiles information for all mobile suits and uses helper functions to scrape entries"""
 	response = urlopen(wiki_link)
 	page = BeautifulSoup(response)
 	kit_tables = page.find_all("table", attrs = {"class": "wikitable sortable"})
@@ -68,6 +73,7 @@ def scrape_wiki(wiki_link):
 
 scrape_wiki(wiki_link)
 
+"""Inserts scraped data from wiki into database table"""
 c.executemany('''INSERT INTO gunpla VALUES (?,?,?,?,?,?,?)''', db_entries)
 conn.commit()
 conn.close()

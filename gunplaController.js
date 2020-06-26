@@ -5,6 +5,7 @@ var db = require('./db');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
+// Get method with options for kit name and release data query strings
 router.get("/", function(req, res) {
   var nameSearch = req.query.name;
   var dateSearch = req.query.date
@@ -47,6 +48,7 @@ router.get("/", function(req, res) {
   }
 });
 
+// Get method using numerical id endpoint
 router.get("/:id", function(req, res) {
   var sql = "SELECT name, series, height, manufacturer, price, release FROM gunpla WHERE id = ?";
   var params = [req.params.id];
@@ -58,6 +60,7 @@ router.get("/:id", function(req, res) {
   });
 });
 
+// Post method that creates a new entry with id auto-generated based on the number of existing entries
 router.post("/", function(req, res) {
   var data = {
     "name": req.body.name,
@@ -89,6 +92,7 @@ router.post("/", function(req, res) {
   });
 });
 
+// Put method updating given entry by id in database
 router.put("/:id", function(req, res){
   var data = {
     "name": req.body.name,
@@ -111,6 +115,7 @@ router.put("/:id", function(req, res){
   });
 });
 
+// Delete method that removes a given entry by id in database
 router.delete("/:id", function(req, res) {
   var sql = "DELETE FROM gunpla WHERE id = ?";
   var params = [req.params.id];
